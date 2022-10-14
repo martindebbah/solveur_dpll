@@ -41,9 +41,13 @@ let coloriage = [[1;2;3];[4;5;6];[7;8;9];[10;11;12];[13;14;15];[16;17;18];[19;20
 let rec simplifie l clauses =
   match clauses with
   | [] -> []
+  (* Si clauses est vide, on retourne l'ensemble vide *)
   | c :: clauses -> let simp =
     List.filter_map (fun x -> if x = l then None else Some x) c
+    (* Sinon, on filtre la clause c à l'aide de List.filter_map *)
   in if (List.equal (fun x y -> x = y) simp c) then c :: simplifie l clauses else simplifie l clauses;;
+  (* Finalement, si la clause de départ est la même que celle après le filtre, on la retourne concaténée à l'appel récursif de 'simplifie' 
+     sinon, on appelle seulement la récursion de 'simplifie' *)
 
 (* solveur_split : int list list -> int list -> int list option
    exemple d'utilisation de `simplifie' *)
@@ -74,9 +78,13 @@ let rec solveur_split clauses interpretation =
 let rec unitaire clauses =
   match clauses with
   | [] -> failwith "Not_found"
+  (* Si clauses est vide, il n'y a pas de clause unitaire *)
   | c1 :: clauses -> match c1 with
+    (* Sinon, on vérifie si c en est une *)
     | x :: [] -> x
+    (* c est une clause unitaire puisqu'elle est de la forme x concaténé à la liste vide, donc on retourne x *)
     | _ -> unitaire clauses;;
+    (* Default : c n'est pas une clause unitaire, on appelle alors 'unitaire' récursivement *)
 
     
 (* pur : int list list -> int
