@@ -30,7 +30,12 @@ Questions sur votre code
    - Si non, expliquez en quelques phrases en français comment
      fonctionne votre implémentation de `simplifie`.
 
-**à remplir**
+   Nous avons utilisé la fonction List.filter_map disponible dans la bibliothèque List de Ocaml. 
+(Cette implémentation nous permet d'avoir la liste dans le même sens que celle de départ)
+Le filtre permet de renvoyer la clause de départ sans le littéral passé en paramètres.
+Ensuite nous faisons une comparaispn entre la clause de départ et celle de retour (avec List.equal). Si elles sont équivalentes,
+c'est que le littéral n'était pas présent dans la clause de départ (on ne peut pas la simplifier),
+on l'insère donc dans la liste de clauses que 'simplifie' retourne sinon on la simplifie et on ne l'ajoute pas.
 
 ---
 
@@ -43,7 +48,10 @@ Questions sur votre code
    comment ces fonctions auxiliaires sont utilisées dans votre
    implémentation de la fonction `unitaire`.
 
-**à remplir**
+   Nous n'avons pas utilisé de fonction auxiliaire. On utilise un 'match' sur chaque clause de l'ensemble des clauses.
+   Si l'une d'entre elles correspond à x :: [], c'est qu'elle ne contient qu'un seul littéral, donc qu'elle est unitaire.
+   Dans ce cas on retourne x, sinon on appelle récursivement 'unitaire' jusqu'à que clauses corresponde à [].
+   Si ce cas est atteint, on lève alors l'exception demandée.
 
 ---
 
