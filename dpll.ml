@@ -27,7 +27,7 @@ let print_modele: int list option -> unit = function
 
 (* ensembles de clauses de test *)
 let exemple_3_12 = [[1;2;-3];[2;3];[-1;-2;3];[-1;-3];[1;-2]]
-let exemple_7_2 = [[1;-1;-3];[-2;3];[-2]]
+let exemple_7_2 = [[1;-2;-3];[-2;3];[-2]]
 let exemple_7_4 = [[1;2;3];[-1;2;3];[3];[1;-2;-3];[-1;-2;-3];[-3]]
 let exemple_7_8 = [[1;-2;3];[1;-3];[2;3];[1;-2]]
 let systeme = [[-1;2];[1;-2];[1;-3];[1;2;3];[-1;-2]]
@@ -38,9 +38,12 @@ let coloriage = [[1;2;3];[4;5;6];[7;8;9];[10;11;12];[13;14;15];[16;17;18];[19;20
 (* simplifie : int -> int list list -> int list list 
    applique la simplification de l'ensemble des clauses en mettant
    le littéral l à vrai *)
-let simplifie l clauses =
-  (* à compléter *)
-  []
+let rec simplifie l clauses =
+  match clauses with
+  | [] -> []
+  | c :: clauses -> let simp =
+    List.filter_map (fun x -> if x = l then None else Some x) c
+  in if (List.equal (fun x y -> x = y) simp c) then c :: simplifie l clauses else simplifie l clauses;;
 
 (* solveur_split : int list list -> int list -> int list option
    exemple d'utilisation de `simplifie' *)
@@ -68,9 +71,13 @@ let rec solveur_split clauses interpretation =
     - si `clauses' contient au moins une clause unitaire, retourne
       le littéral de cette clause unitaire ;
     - sinon, lève une exception `Not_found' *)
-let unitaire clauses =
-  (* à compléter *)
-  0
+let rec unitaire clauses =
+  match clauses with
+  | [] -> failwith "Not_found"
+  | c1 :: clauses -> match c1 with
+    | x :: [] -> x
+    | _ -> unitaire clauses;;
+
     
 (* pur : int list list -> int
     - si `clauses' contient au moins un littéral pur, retourne
