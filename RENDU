@@ -30,12 +30,14 @@ Questions sur votre code
    - Si non, expliquez en quelques phrases en français comment
      fonctionne votre implémentation de `simplifie`.
 
-   Nous avons utilisé la fonction List.filter_map disponible dans la bibliothèque List de Ocaml. 
-(Cette implémentation nous permet d'avoir la liste dans le même sens que celle de départ)
-Le filtre permet de renvoyer la clause de départ sans le littéral passé en paramètres.
-Ensuite nous faisons une comparaispn entre la clause de départ et celle de retour (avec List.equal). Si elles sont équivalentes,
-c'est que le littéral n'était pas présent dans la clause de départ (on ne peut pas la simplifier),
-on l'insère donc dans la liste de clauses que 'simplifie' retourne sinon on la simplifie et on ne l'ajoute pas.
+   'simplifie' est une fonction récursive qui utilise un pattern matching sur les éléments de 'clauses'.
+Si 'clauses' est l'ensemble vide, on retourne l'ensemble vide.
+Ensuite, pour chaque clause c, on vérifie si c contient l, le littéral à simplifier.
+Si c'est le cas, on appelle seulement la fonction 'simplifie'.
+Si c contient la négation de l, on applique filter_map à c 
+avec une fonction qui renvoie None si x = -l et Some x sinon.
+Finalement, si c ne contient ni l ni sa négation, on ne touche pas à la clause c 
+et on la concatène à l'appel récursif de 'simplifie'.
 
 ---
 

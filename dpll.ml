@@ -42,13 +42,15 @@ let rec simplifie l clauses =
   match clauses with
   | [] -> []
   (* Si clauses est vide, on retourne l'ensemble vide *)
-  | c :: clauses -> let simp =
-    List.filter_map (fun x -> if x = l then None else Some x) c
+  | c :: clauses -> let s = filter_map (fun x -> if x = -l then None else Some x) c
     (* Sinon, on filtre la clause c à l'aide de List.filter_map *)
-  in if (List.equal (fun x y -> x = y) simp c) then c :: simplifie l clauses else simplifie l clauses;;
-  (* Finalement, si la clause de départ est la même que celle après le filtre, on la retourne concaténée à l'appel récursif de 'simplifie' 
-     sinon, on appelle seulement la récursion de 'simplifie' *)
-
+  in if mem l c then simplifie l clauses else
+    (* Si c contient l, on appelle 'simplifie' récursivement *)
+    if mem (-l) c then s :: simplifie l clauses else
+      (* Si c contient -l, on concatène la clause filtrée à l'appel récursif de 'simplifie' *)
+      c :: simplifie l clauses;;
+      (* Sinon, on concatène c à l'appel récursif de 'simplifie' *)
+  
 (* solveur_split : int list list -> int list -> int list option
    exemple d'utilisation de `simplifie' *)
 (* cette fonction ne doit pas être modifiée, sauf si vous changez 
@@ -56,7 +58,7 @@ let rec simplifie l clauses =
 let rec solveur_split clauses interpretation =
   (* l'ensemble vide de clauses est satisfiable *)
   if clauses = [] then Some interpretation else
-  (* un clause vide n'est jamais satisfiable *)
+  (* une clause vide n'est jamais satisfiable *)
   if mem [] clauses then None else
   (* branchement *) 
   let l = hd (hd clauses) in
@@ -66,8 +68,8 @@ let rec solveur_split clauses interpretation =
   | _    -> branche
 
 (* tests *)
-(* let () = print_modele (solveur_split systeme []) *)
-(* let () = print_modele (solveur_split coloriage []) *)
+let () = print_modele (solveur_split systeme [])
+let () = print_modele (solveur_split coloriage [])
 
 (* solveur dpll récursif *)
     
@@ -79,7 +81,7 @@ let rec unitaire clauses =
   match clauses with
   | [] -> failwith "Not_found"
   (* Si clauses est vide, il n'y a pas de clause unitaire *)
-  | c1 :: clauses -> match c1 with
+  | c :: clauses -> match c with
     (* Sinon, on vérifie si c en est une *)
     | x :: [] -> x
     (* c est une clause unitaire puisqu'elle est de la forme x concaténé à la liste vide, donc on retourne x *)
@@ -104,6 +106,6 @@ let rec solveur_dpll_rec clauses interpretation =
 (* let () = print_modele (solveur_dpll_rec systeme []) *)
 (* let () = print_modele (solveur_dpll_rec coloriage []) *)
 
-let () =
+(* let () =
   let clauses = Dimacs.parse Sys.argv.(1) in
-  print_modele (solveur_dpll_rec clauses [])
+  print_modele (solveur_dpll_rec clauses []) *)
