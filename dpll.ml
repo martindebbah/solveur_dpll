@@ -68,8 +68,8 @@ let rec solveur_split clauses interpretation =
   | _    -> branche
 
 (* tests *)
-let () = print_modele (solveur_split systeme [])
-let () = print_modele (solveur_split coloriage [])
+(* let () = print_modele (solveur_split systeme []) *)
+(* let () = print_modele (solveur_split coloriage []) *)
 
 (* solveur dpll récursif *)
     
@@ -104,13 +104,21 @@ let pur clauses =
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
 let rec solveur_dpll_rec clauses interpretation =
-  (* à compléter *)
-  None
+  if clauses = [] then Some interpretation else
+    (* L'ensmble vide de clauses est satisfiable *)
+  if mem [] clauses then None else
+    (* Une clause vide n'est pas satisfiable *)
+  try solveur_dpll_rec (simplifie (unitaire clauses) clauses) ((unitaire clauses)::interpretation) with
+    (* On essaie d'abord de simplifier un littéral unitaire s'il existe puis d'appeler la récursion *)
+    e -> try solveur_dpll_rec (simplifie (pur clauses) clauses) ((pur clauses)::interpretation) with
+      (* On essaie ensuite de simplifier un littéral pur s'il existe puis d'appeler la récursion *)
+    e -> solveur_dpll_rec (simplifie (hd (hd clauses)) clauses) ((hd (hd clauses))::interpretation);;
+      (* Il n'y a plus de clause unitaire/littéral pur, on simplifie par le premier terme *)
 
 (* tests *)
-(* let () = print_modele (solveur_dpll_rec systeme []) *)
+(* let () = print_modele (solveur_dpll_rec exemple_3_12 []) *)
 (* let () = print_modele (solveur_dpll_rec coloriage []) *)
 
-(* let () =
+let () =
   let clauses = Dimacs.parse Sys.argv.(1) in
-  print_modele (solveur_dpll_rec clauses []) *)
+  print_modele (solveur_dpll_rec clauses [])
