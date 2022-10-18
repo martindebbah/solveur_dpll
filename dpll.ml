@@ -42,11 +42,12 @@ let rec simplifie l clauses =
   match clauses with
   | [] -> []
   (* Si clauses est vide, on retourne l'ensemble vide *)
-  | c :: clauses -> let s = filter_map (fun x -> if x = -l then None else Some x) c
-    (* Sinon, on filtre la clause c à l'aide de filter_map *)
-  in if mem l c then simplifie l clauses else
+  | c :: clauses -> if mem l c then simplifie l clauses else
     (* Si c contient l, on appelle 'simplifie' récursivement *)
-    if mem (-l) c then s :: simplifie l clauses else
+    let s = filter_map (fun x -> if x = -l then None else Some x) c
+    (* Sinon, on filtre la clause c à l'aide de filter_map *)
+    (* Le filtre supprime la négation du littéral l, si elle existe *)
+    in if mem (-l) c then s :: simplifie l clauses else
       (* Si c contient -l, on concatène la clause filtrée à l'appel récursif de 'simplifie' *)
       c :: simplifie l clauses;;
       (* Sinon, on concatène c à l'appel récursif de 'simplifie' *)
@@ -68,7 +69,7 @@ let rec solveur_split clauses interpretation =
   | _    -> branche
 
 (* tests *)
-(* let () = print_modele (solveur_split systeme []) *)
+(* let () = print_modele (solveur_split exemple_7_2 []) *)
 (* let () = print_modele (solveur_split coloriage []) *)
 
 (* solveur dpll récursif *)
@@ -116,7 +117,7 @@ let rec solveur_dpll_rec clauses interpretation =
       (* Il n'y a plus de clause unitaire/littéral pur, on simplifie par le premier terme *)
 
 (* tests *)
-(* let () = print_modele (solveur_dpll_rec exemple_3_12 []) *)
+(* let () = print_modele (solveur_dpll_rec exemple_7_2 []) *)
 (* let () = print_modele (solveur_dpll_rec coloriage []) *)
 
 let () =
