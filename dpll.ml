@@ -43,7 +43,7 @@ let rec simplifie l clauses =
   | [] -> []
   (* Si clauses est vide, on retourne l'ensemble vide *)
   | c :: clauses -> let s = filter_map (fun x -> if x = -l then None else Some x) c
-    (* Sinon, on filtre la clause c à l'aide de List.filter_map *)
+    (* Sinon, on filtre la clause c à l'aide de filter_map *)
   in if mem l c then simplifie l clauses else
     (* Si c contient l, on appelle 'simplifie' récursivement *)
     if mem (-l) c then s :: simplifie l clauses else
@@ -79,7 +79,7 @@ let () = print_modele (solveur_split coloriage [])
     - sinon, lève une exception `Not_found' *)
 let rec unitaire clauses =
   match clauses with
-  | [] -> failwith "Not_found"
+  | [] -> raise (Failure "Not_found")
   (* Si clauses est vide, il n'y a pas de clause unitaire *)
   | c :: clauses -> match c with
     (* Sinon, on vérifie si c en est une *)
@@ -87,15 +87,20 @@ let rec unitaire clauses =
     (* c est une clause unitaire puisqu'elle est de la forme x concaténé à la liste vide, donc on retourne x *)
     | _ -> unitaire clauses;;
     (* Default : c n'est pas une clause unitaire, on appelle alors 'unitaire' récursivement *)
-
     
 (* pur : int list list -> int
     - si `clauses' contient au moins un littéral pur, retourne
       ce littéral ;
     - sinon, lève une exception `Failure "pas de littéral pur"' *)
 let pur clauses =
-  (* à compléter *)
-  0
+  let l = flatten clauses
+  (* On utilise flatten pour avoir une liste simple *)
+  in let m = map (fun x -> if mem (-x) l then x :: [-x] else [x]) l
+  (* Pour chaque éléments de l, on regarde si l contient sa négation.
+    Si c'est le cas, on crée un tuple [x;-x] *)
+  in try unitaire m with
+    e -> raise (Failure "Pas de litteral pur");;
+    (* Finalement, si il existe un élément de m qui n'est pas un tuple, c'est qu'il est pur *)
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
 let rec solveur_dpll_rec clauses interpretation =
