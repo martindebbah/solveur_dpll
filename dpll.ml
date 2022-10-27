@@ -44,13 +44,11 @@ let rec simplifie l clauses =
   (* Si clauses est vide, on retourne l'ensemble vide *)
   | c :: clauses -> if mem l c then simplifie l clauses else
     (* Si c contient l, on appelle 'simplifie' récursivement *)
-    let s = filter_map (fun x -> if x = -l then None else Some x) c
+    let s = rev (filter_map (fun x -> if x = -l then None else Some x) c)
     (* Sinon, on filtre la clause c à l'aide de filter_map *)
     (* Le filtre supprime la négation du littéral l, si elle existe *)
-    in if mem (-l) c then s :: simplifie l clauses else
-      (* Si c contient -l, on concatène la clause filtrée à l'appel récursif de 'simplifie' *)
-      c :: simplifie l clauses;;
-      (* Sinon, on concatène c à l'appel récursif de 'simplifie' *)
+    in s :: simplifie l clauses
+    (* Finalement, on concatène la clause filtrée à l'appel récursif de 'simplifie' *)
   
 (* solveur_split : int list list -> int list -> int list option
    exemple d'utilisation de `simplifie' *)
@@ -69,7 +67,7 @@ let rec solveur_split clauses interpretation =
   | _    -> branche
 
 (* tests *)
-(* let () = print_modele (solveur_split exemple_7_2 []) *)
+(* let () = print_modele (solveur_split [[1;-2;-3];[-2;3];[-2]] []) *)
 (* let () = print_modele (solveur_split coloriage []) *)
 
 (* solveur dpll récursif *)
@@ -113,11 +111,15 @@ let rec solveur_dpll_rec clauses interpretation =
     (* On essaie d'abord de simplifier un littéral unitaire s'il existe puis d'appeler la récursion *)
     e -> try solveur_dpll_rec (simplifie (pur clauses) clauses) ((pur clauses)::interpretation) with
       (* On essaie ensuite de simplifier un littéral pur s'il existe puis d'appeler la récursion *)
-    e -> solveur_dpll_rec (simplifie (hd (hd clauses)) clauses) ((hd (hd clauses))::interpretation);;
+      e -> let branche = solveur_dpll_rec (simplifie (hd (hd clauses)) clauses) ((hd (hd clauses))::interpretation)
       (* Il n'y a plus de clause unitaire/littéral pur, on simplifie par le premier terme *)
+  in match branche with
+  | None -> solveur_dpll_rec (simplifie (-(hd (hd clauses))) clauses) ((-(hd (hd clauses))) :: interpretation)
+  (* Si l ne donne pas d'interprétation satisfaisant clauses, on essaie sa négation *)
+  | _ -> branche;;
 
 (* tests *)
-(* let () = print_modele (solveur_dpll_rec exemple_7_2 []) *)
+(* let () = print_modele (solveur_dpll_rec [[1;-2;-3];[-2;3];[-2]] []) *)
 (* let () = print_modele (solveur_dpll_rec coloriage []) *)
 
 let () =

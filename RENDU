@@ -19,7 +19,7 @@ Questions sur votre code
    et que ensuite `./dpll sudoku-4x4.cnf` donne la réponse attendue (voir
    fichier README) ?
 
-   La commande `make dpll` s'exécute sans erreur ni warning.
+   La commande `make dpll` s'exécute sans erreur, ni warning.
 La commande `./dpll sudoku-4x4.cnf` donne également la réponse attendue.
 
 ---
@@ -35,11 +35,9 @@ La commande `./dpll sudoku-4x4.cnf` donne également la réponse attendue.
 Si `clauses` est l'ensemble vide, on retourne l'ensemble vide.
 Ensuite, pour chaque clause c, on vérifie si c contient l, le littéral à simplifier.
 Si c'est le cas, on appelle seulement récursivement la fonction `simplifie`.
-Si c contient la négation de l, on applique filter_map à c 
-avec une fonction qui renvoie None si x = -l et Some x sinon.
-Puis on concatène le résultat de filter_map à l'appele récursif de `simplifie`.
-Finalement, si c ne contient ni l ni sa négation, on ne touche pas à la clause c 
-et on la concatène à l'appel récursif de `simplifie`.
+Sinon, on applique `filter_map` à c. (On applique également `List.rev` pour garder la clause dans l'ordre d'origine)
+On utilise un filtre qui permet de renvoyer c sans la négation de l, si elle existe.
+Finalement, on concatène la clause filtrée à l'appel récursif de `simplifie`.
 
 ---
 
@@ -53,9 +51,9 @@ et on la concatène à l'appel récursif de `simplifie`.
    implémentation de la fonction `unitaire`.
 
    Nous n'avons pas utilisé de fonction auxiliaire. On utilise un `match` sur chaque clause de l'ensemble des clauses.
-   Si l'une d'entre elles correspond à x :: [], c'est qu'elle ne contient qu'un seul littéral, donc qu'elle est unitaire.
-   Dans ce cas on retourne x, sinon on appelle récursivement `unitaire` jusqu'à que `clauses` corresponde à [].
-   Si ce cas est atteint, c'est qu'aucune clause n'est unitaire, on lève alors l'exception demandée.
+Si l'une d'entre elles correspond à x :: [], c'est qu'elle ne contient qu'un seul littéral, donc qu'elle est unitaire.
+Dans ce cas on retourne x, sinon on appelle récursivement `unitaire` jusqu'à que `clauses` corresponde à [].
+Si ce cas est atteint, c'est qu'aucune clause n'est unitaire, on lève alors l'exception demandée.
 
 ---
 
